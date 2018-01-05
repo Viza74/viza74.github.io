@@ -1,40 +1,257 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-<title>CCatGames</title>
-<style>
-    body { 
-    width:99%; 
-    height:100%; 
-    background:url(ccatgames_blog_logo.png) center center no-repeat;
-    }
-    html {
-        width: 100wh;
-        height: 90vh;
-        color: #fff;
-        background: linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB);
-        background-size: 400% 400%;
-        -webkit-animation: bganim 15s ease infinite;
-        -moz-animation: bganim 15s ease infinite;
-        animation: bganim 15s ease infinite;
-    }
-    @-webkit-keyframes bganim {
-        0%{background-position:0% 50%}
-        50%{background-position:100% 51%}
-        100%{background-position:0% 50%}
-    }
-    @-moz-keyframes bganim {
-        0%{background-position:0% 50%}
-        50%{background-position:100% 51%}
-        100%{background-position:0% 50%}
-    }
-    @keyframes bganim { 
-        0%{background-position:0% 50%}
-        50%{background-position:100% 51%}
-        100%{background-position:0% 50%}
-    }
-</style>
+    <meta charset="UTF-8">
+    <title>CCatGames</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            height: 100%;
+        }
+
+        html {
+            width: 100wh;
+            height: 90vh;
+            color: #fff;
+            background: linear-gradient(-45deg, #EE7752, #E73C7E, #23A6D5, #23D5AB);
+            background-size: 400% 400%;
+            -webkit-animation: bganim 15s ease infinite;
+            -moz-animation: bganim 15s ease infinite;
+            animation: bganim 15s ease infinite;
+        }
+
+        @-webkit-keyframes bganim {
+            0% {
+                background-position: 0% 50%
+            }
+            50% {
+                background-position: 100% 51%
+            }
+            100% {
+                background-position: 0% 50%
+            }
+        }
+
+        @-moz-keyframes bganim {
+            0% {
+                background-position: 0% 50%
+            }
+            50% {
+                background-position: 100% 51%
+            }
+            100% {
+                background-position: 0% 50%
+            }
+        }
+
+        @keyframes bganim {
+            0% {
+                background-position: 0% 50%
+            }
+            50% {
+                background-position: 100% 51%
+            }
+            100% {
+                background-position: 0% 50%
+            }
+        }
+
+        #myCanvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: block
+        }
+    </style>
+
+
 </head>
+
 <body>
+    <canvas id="myCanvas"></canvas>
+    <img id="colors" style="display: none;" src="heatcolors.png">
+    <img id="logo" style="display: none;" src="ccatgames_blog_logo.png">
 </body>
+
+<script>
+    var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+    var max_distance = 300;
+    var mouseX = 0
+    var mouseY = 0
+    var points = []
+    var imgData
+    var logoimg = document.getElementById("logo")
+
+    window.onload = function (e) {
+        logoimg = document.getElementById("logo")
+        imgData = getImageColors(document.getElementById("colors"))
+        resize(canvas)
+        for (let i = 0; i < 113; i++) {
+            points.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: Math.random() * 6 - 3,
+                vy: Math.random() * 6 - 3,
+            })
+        }
+
+
+    }
+    window.addEventListener('mousemove', getMousePos, false);
+    requestAnimationFrame(drawScene);
+
+    function getImageColors(img) {
+        var tcanvas = document.createElement('canvas');
+        var tcontext = tcanvas.getContext('2d');
+        tcanvas.width = img.width;
+        tcanvas.height = img.height;
+        tcontext.drawImage(img, 0, 0);
+        var imgdata = tcontext.getImageData(0, 0, img.width, img.height);
+        return imgdata
+    }
+
+
+    function drawScene(now) {
+        resize(canvas)
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (var i = 0; i < points.length; i++) {
+            var p = points[i]
+            p.x += p.vx
+            p.y += p.vy
+
+            if (p.x < 0 || p.x > canvas.width) {
+                p.vx = -p.vx
+                p.x = Math.min(canvas.width, Math.max(0,p.x))
+            }
+            if (p.y < 0 || p.y > canvas.height) {
+                p.vy = -p.vy
+                p.y = Math.min(canvas.height, Math.max(0,p.y))
+            }
+            if (dist({x:0,y:0},{x:p.vx,y:p.vy})>1) {
+                p.vx *= 0.999
+                p.vy *= 0.999
+            }
+            p.mindist = 100000;
+        }
+
+        ctx.lineWidth = 1;
+        for (var i = 0; i < points.length; i++) {
+            var p = points[i]
+            for (var j = 0; j < points.length; j++) {
+                if (i==j) {
+                    continue
+                }
+                var p2 = points[j]
+                var d = drawDistLine(p, p2, 100)
+                if (p.mindist > d) {
+                    p.mindist = d
+                }
+                if (p2.mindist > d) {
+                    p2.mindist = d
+                }
+            }
+
+            var d = drawDistLine({ x: mouseX, y: mouseY }, p, 200)
+            if (p.mindist > d) {
+                p.mindist = d
+            }
+            if (d<200) {
+                p.vx -= (p.x-mouseX)*0.00051
+                p.vy -= (p.y-mouseY)*0.00051
+            }
+
+            var d = drawDistLine({ x: canvas.width/2-logoimg.width/2, y: canvas.height/2-logoimg.height/2 }, p, 100)
+            var d = drawDistLine({ x: canvas.width/2+logoimg.width/2, y: canvas.height/2-logoimg.height/2 }, p, 100)
+            var d = drawDistLine({ x: canvas.width/2-logoimg.width/2, y: canvas.height/2+logoimg.height/2 }, p, 100)
+            var d = drawDistLine({ x: canvas.width/2+logoimg.width/2, y: canvas.height/2+logoimg.height/2 }, p, 100)
+            
+            var d = drawDistLine({ x: canvas.width/2, y: canvas.height/2-logoimg.height/2 }, p, 100)
+            var d = drawDistLine({ x: canvas.width/2, y: canvas.height/2+logoimg.height/2 }, p, 100)
+
+        }
+
+        for (var i = 0; i < points.length; i++) {
+            var p = points[i]
+            ctx.fillStyle = getColorAtPercent(p.mindist/100)
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 5*(1-(p.mindist/100))+3, 0, 2 * Math.PI);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        ctx.drawImage(logoimg, 
+            canvas.width / 2 - logoimg.width / 2 + (mouseX-canvas.width/2)*0.1, 
+            canvas.height / 2 - logoimg.height / 2 + (mouseY-canvas.height/2)*0.1
+        );
+
+        requestAnimationFrame(drawScene);
+    }
+
+    function getColorAtPercent(p) {
+        var ppos = Math.floor(p * imgData.width) * 4
+        var red = imgData.data[ppos]
+        var green = imgData.data[ppos + 1]
+        var blue = imgData.data[ppos + 2]
+        var alpha = imgData.data[ppos + 3]
+        // return "rgba(" + red + ", " + green + ", " + blue + ", 1)"
+        return "rgba(" + red + ", " + green + ", " + blue + ", "+((1-p)/2+0.5)+")"
+    }
+
+    function drawDistLine(p1, p2, maxdist) {
+        var d = dist(p1, p2)
+        if (d < maxdist) {
+            ctx.strokeStyle = getColorAtPercent(d/maxdist)
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+            return d
+        }
+        return maxdist
+    }
+
+    function dist(p1, p2) {
+        var a = p1.x - p2.x
+        var b = p1.y - p2.y
+        return Math.sqrt(a * a + b * b);
+    }
+
+    function resize(canvas) {
+        // Lookup the size the browser is displaying the canvas.
+        var displayWidth = canvas.clientWidth;
+        var displayHeight = canvas.clientHeight;
+
+        // Check if the canvas is not the same size.
+        if (canvas.width != displayWidth ||
+            canvas.height != displayHeight) {
+
+            // Make the canvas the same size
+            canvas.width = displayWidth;
+            canvas.height = displayHeight;
+        }
+    }
+
+
+
+    function getMousePos(evt) {
+        var rect = canvas.getBoundingClientRect();
+        mouseX = evt.clientX - rect.left
+        mouseY = evt.clientY - rect.top
+    }
+
+
+
+
+
+</script>
+
 </html>
