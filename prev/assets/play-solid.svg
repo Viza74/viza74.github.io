@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="894px" height="893px" viewBox="0 0 894 893" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 55.2 (78181) - https://sketchapp.com -->
+    <title>play-solid</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="play-solid" fill="#FFFFFF" fill-rule="nonzero">
+            <path d="M447,0 C200.068548,0 0,199.844758 0,446.5 C0,693.155242 200.068548,893 447,893 C693.931452,893 894,693.155242 894,446.5 C894,199.844758 693.931452,0 447,0 Z M447,806.580645 C247.832661,806.580645 86.516129,645.444556 86.516129,446.5 C86.516129,247.555444 247.832661,86.4193548 447,86.4193548 C646.167339,86.4193548 807.483871,247.555444 807.483871,446.5 C807.483871,645.444556 646.167339,806.580645 447,806.580645 Z" id="Shape-Copy-7"></path>
+            <path d="M684.4,414.7 L332.4,206.6 C303.8,189.7 260,206.1 260,247.9 L260,664 C260,701.5 300.7,724.1 332.4,705.3 L684.4,497.3 C715.8,478.8 715.9,433.2 684.4,414.7 Z" id="Path"></path>
+        </g>
+    </g>
+</svg>
